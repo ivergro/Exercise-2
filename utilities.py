@@ -34,34 +34,6 @@ def H(atom_spins):
 
     return -sum_coupling-sum_anisotropy-sum_external_field
 
-#Help equation for LLG, returns a vector
-def H_eff(atom_list, j, t, delta_t, include_Zeeman_term = True):
-
-    #--------Sums----------
-    coupling = np.array(0,0,0)
-    anisotropy = np.array(0,0,0)
-    field = np.array(0,0,0)
-
-    #Periodic BC and nearest neighbour interactions included
-    if j == len(atom_list):
-      coupling += -J/2(atom_list[0].vector + atom_list[j-1].vector)
-    elif j == 0:
-        coupling += -J/2(atom_list[j+1].vector + atom_list[-1].vector)
-    else:
-        coupling += -J/2(atom_list[j+1].vector + atom_list[j-1].vector)
-
-    anisotropy += -2*d_z*np.dot(atom_list[j].vector, e_z)*e_z
-
-    if include_Zeeman_term:
-        field += -uB_0*B
-    
-    return -1/gamma*(coupling + anisotropy + field) + gaussian_thermal_noise(t, delta_t)
-
-    
-#LLG, returns a vector
-def dt_sj(atom_list, s_j, j, t, delta_t):
-    H_eff_j = H_eff(atom_list, j, t, delta_t)
-    return -gamma/(1+alpha**2) * (np.cross(s_j,H_eff_j) + alpha*np.cross(s_j, (np.cross(s_j, H_eff_j))))
 
 #Returns a random vector with numbers between -1 and 1
 def gamma_vector(t):
@@ -71,16 +43,70 @@ def gaussian_thermal_noise(t, delta_t):
     return gamma_vector(t) * np.sqrt((2*alpha*kB_T*temp) / (gamma*u*delta_t))
 
 
-def Heun(S_j0, timesteps, magnet_list):
-    S = np.zeros(len(magnet_list))
-    delta_t = (timesteps[-1] - timesteps[0])/len(timesteps)
-    for j in range(magnet_list):
-        S_j = np.zeros(timesteps) #vektor array?
-        S_j[0] = S_j0  #Første S verdi for en magnet?
-        for n in range(timesteps - 1):
-            #Ikke sende inn indekseringa, men den nåværende spin verdien til magnet j
-            dt_Sj = dt_sj(magnet_list, j, timesteps[n], delta_t)
-            S_jn = S_j[n]
-            S_j[n+1] = S_jn + delta_t/2*(dt_Sj   + dt_sj(magnet_list, j +1, timesteps[n+1], ))    
+#Prøver å gjøre om så funksjonene kjører over hele lista med atomer, og returner y_n, matrise over alle spins
 
-        S[j].append(S_j) #Lager den en grei 2D matrise?
+#Help equation for LLG, returns a vector
+def H_eff(y_n, j, t, delta_t, include_Zeeman_term = True):
+
+    #--------Sums----------
+    coupling = np.array(0,0,0)
+    anisotropy = np.array(0,0,0)
+    field = np.array(0,0,0)
+
+    #Periodic BC and nearest neighbour interactions included
+    if j == len(y_n):
+      coupling += -J/2(y_n[0] + y_n[j-1])
+    elif j == 0:
+        coupling += -J/2(y_n[j+1] + y_n[-1])
+    elif len(y_n) == 1:
+        coupling = 0
+    else:
+        coupling += -J/2(y_n[j+1] + y_n[j-1])
+
+    anisotropy += -2*d_z*np.dot(y_n[j], e_z)*e_z
+
+    if include_Zeeman_term:
+        field += -uB_0*B
+    
+    return -1/gamma*(coupling + anisotropy + field) + gaussian_thermal_noise(t, delta_t)
+
+    
+#LLG, returns an array of derivated magnet vectors
+def dt_sj(t, delta_t, y_n):
+    f_t_n = np.empty(len(y_n), 3)
+    for j in range(len(y_n)):
+        H_eff_j = H_eff(y_n, j, t, delta_t)
+        s_j     = y_n[j]
+        f_t_n[j]  = -gamma/(1+alpha**2) * (np.cross(s_j,H_eff_j) + alpha*np.cross(s_j, (np.cross(s_j, H_eff_j))))
+    return f_t_n
+
+#y_0 = initial magnets (not spins but objects)
+#y_n => array with all magnets
+#timesteps = number of timesteps
+#n and t is the same here
+
+def Heun(y_0, t_0, t_n, delta_t = 1):
+    y_n = y_0
+    #Tegn første steg her
+    for n in range(t_0, t_n + 1):
+        y_n = Heun_step(y_n, n, delta_t)
+        #tegn de nye posisjonene
+
+
+def Heun_step(y_n, t_n, delta_t):
+    f_y_n = np.empty(len(y_n), 3)
+    f_y_next = np.empty(len(y_n), 3)
+
+    #Calculating f(t_n, y_n) to use in both y_p_next and y_next
+    for j in range(len(y_n)):
+        f_y_n[j] = dt_sj(t_n, delta_t, y_n)
+
+    y_p_next = y_n + delta_t*f_y_n
+
+    for j in range(len(y_n)):
+        f_y_next[j] = dt_sj(t_n + delta_t, delta_t, y_p_next)
+    
+    return y_n + delta_t/2 * (f_y_n + f_y_next)
+
+
+

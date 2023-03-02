@@ -3,9 +3,9 @@ import random as r
 import scipy.constants as sp
 
 #------Constants-------
-J     = 0.01    #[eV]
+J     = 0.00    #[eV]
 d_z   = 0.003   #[eV] 
-kB_T  = 0.001   #[eV]
+kB_T  = 0.000   #[eV]
 uB_0  = 0.003   #[eV]
 gamma = 1.6*10**11 #[Hz/T]
 u     = 5.8*10**(-5) #[eV/T]
@@ -13,8 +13,8 @@ alpha = 0.0
 temp  = kB_T/sp.k
 #----------------------
 #-------Vectors--------
-B = np.array(0,0,*uB_0) #Dele på u?
-e_z = np.array(0,0,1)
+B = np.array([0.0,0.0,0*uB_0/u]) #Dele på u?
+e_z = np.array([0.0,0.0,1.0])
 #----------------------
 
 
@@ -49,19 +49,19 @@ def gaussian_thermal_noise(t, delta_t):
 def H_eff(y_n, j, t, delta_t, include_Zeeman_term = True):
 
     #--------Sums----------
-    coupling = np.array(0,0,0)
-    anisotropy = np.array(0,0,0)
-    field = np.array(0,0,0)
+    coupling = np.array([0.0, 0.0, 0.0])
+    anisotropy = np.array([0.0, 0.0, 0.0])
+    field = np.array([0.0, 0.0, 0.0])
 
     #Periodic BC and nearest neighbour interactions included
-    if j == len(y_n):
-      coupling += -J/2(y_n[0] + y_n[j-1])
-    elif j == 0:
-        coupling += -J/2(y_n[j+1] + y_n[-1])
-    elif len(y_n) == 1:
+    if len(y_n) == 1:
         coupling = 0
+    elif j == len(y_n):
+      coupling += -J/2*(y_n[0] + y_n[j-1])
+    elif j == 0:
+        coupling += -J/2*(y_n[j+1] + y_n[-1])
     else:
-        coupling += -J/2(y_n[j+1] + y_n[j-1])
+        coupling += -J/2*(y_n[j+1] + y_n[j-1])
 
     anisotropy += -2*d_z*np.dot(y_n[j], e_z)*e_z
 
@@ -73,7 +73,7 @@ def H_eff(y_n, j, t, delta_t, include_Zeeman_term = True):
     
 #LLG, returns an array of derivated magnet vectors
 def dt_sj(t, delta_t, y_n):
-    f_t_n = np.empty(len(y_n), 3)
+    f_t_n = np.empty((len(y_n), 3))
     for j in range(len(y_n)):
         H_eff_j = H_eff(y_n, j, t, delta_t)
         s_j     = y_n[j]
@@ -88,14 +88,25 @@ def dt_sj(t, delta_t, y_n):
 def Heun(y_0, t_0, t_n, delta_t = 1):
     y_n = y_0
     #Tegn første steg her
-    for n in range(t_0, t_n + 1):
+    #Funker kun for en magnet nå
+    spin_values = np.empty((int((t_n - t_0)/delta_t), 3))
+    for n in range(t_0, t_n , delta_t):
         y_n = Heun_step(y_n, n, delta_t)
+
+        #---normalisering---
+        # for i in range(len(y_n)):
+        #     if np.linalg.norm(y_n[i]) != 1:
+        #         y_n[i] = y_n[i]/np.sqrt(y_n[i][0]**2 + y_n[i][1]**2 + y_n[i][2]**2)          
+        #-------------------
+
+        spin_values[int(n/delta_t)] = y_n
         #tegn de nye posisjonene
+    return spin_values
 
 
 def Heun_step(y_n, t_n, delta_t):
-    f_y_n = np.empty(len(y_n), 3)
-    f_y_next = np.empty(len(y_n), 3)
+    f_y_n = np.empty((len(y_n), 3))
+    f_y_next = np.empty((len(y_n), 3))
 
     #Calculating f(t_n, y_n) to use in both y_p_next and y_next
     for j in range(len(y_n)):

@@ -34,7 +34,9 @@ def draw_spins_one_mag(spin_values):
     fig.show()
         
 
-spin_values = u.Heun(mag_list, 0, 10000, 100)#10**(-7), 10**(-8))
+timestep = np.linspace(0, 10**(-7), num=100)
+
+spin_values = u.Heun(mag_list, timestep)#10**(-7), 10**(-8))
 
 f = open("vector_data.txt", "w")
 for vector in spin_values:

@@ -85,14 +85,16 @@ def dt_sj(t, delta_t, y_n):
 #timesteps = number of timesteps
 #n and t is the same here
 
-def Heun(y_0, t_0, t_n, delta_t = 1):
+def Heun(y_0, timesteps):
     y_n = y_0
     #Tegn første steg her
     #Funker kun for en magnet nå
-    spin_values = np.empty((int((t_n - t_0)/delta_t) + 1, 3))
+    spin_values = np.empty((len(timesteps) + 1, 3))
     spin_values[0] = y_0
-    for n in range(t_0, t_n , delta_t):
-        y_n = Heun_step(y_n, n, delta_t)
+    delta_t = timesteps[1] - timesteps[0]
+    n = 0
+    for t_n in timesteps:
+        y_n = Heun_step(y_n, t_n, delta_t)
 
         #---normalisering---
         # for i in range(len(y_n)):
@@ -100,7 +102,8 @@ def Heun(y_0, t_0, t_n, delta_t = 1):
         #     y_n = y_n/ np.linalg.norm(y_n)        
         #-------------------
 
-        spin_values[int(n/delta_t) + 1] = y_n
+        spin_values[n + 1] = y_n
+        n += 1
         #tegn de nye posisjonene
     return spin_values
 

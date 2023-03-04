@@ -89,17 +89,18 @@ def Heun(y_0, t_0, t_n, delta_t = 1):
     y_n = y_0
     #Tegn første steg her
     #Funker kun for en magnet nå
-    spin_values = np.empty((int((t_n - t_0)/delta_t), 3))
+    spin_values = np.empty((int((t_n - t_0)/delta_t) + 1, 3))
+    spin_values[0] = y_0
     for n in range(t_0, t_n , delta_t):
         y_n = Heun_step(y_n, n, delta_t)
 
         #---normalisering---
         # for i in range(len(y_n)):
-        #     if np.linalg.norm(y_n[i]) != 1:
-        #         y_n[i] = y_n[i]/np.sqrt(y_n[i][0]**2 + y_n[i][1]**2 + y_n[i][2]**2)          
+        # if np.linalg.norm(y_n) != 1:
+        #     y_n = y_n/ np.linalg.norm(y_n)        
         #-------------------
 
-        spin_values[int(n/delta_t)] = y_n
+        spin_values[int(n/delta_t) + 1] = y_n
         #tegn de nye posisjonene
     return spin_values
 

@@ -76,6 +76,8 @@ def update(i):
     text = ax.text(0.4, 0.4, -0.2, "l: " + str(round(v_length, 2)))
     
 
-ani = FuncAnimation(fig, update, frames=np.linspace(0,len(vector_list) - 1, num=len(vector_list)), interval=50) #Nå vil linspace lage masse float verdier, for å kjøre kajppere, så kan num=len(vector_list)
+ #Nå vil linspace lage masse float verdier
+ #For å skippe masse verdier, kan num=len(vector_list) fjernes
+ani = FuncAnimation(fig, update, frames=np.linspace(0,len(vector_list) - 1), interval=50)
 plt.show()
 #-----------------------------------

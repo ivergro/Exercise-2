@@ -1,4 +1,3 @@
-import Magnet
 import utilities as u
 import plotly.graph_objects as go
 import numpy as np
@@ -6,8 +5,9 @@ import numpy as np
 
 def one_magnet():
     spin_vector = np.array([0.3, 0.3, np.sqrt(1 - 0.3**2 - 0.3**2)])
-    mag_position = [0, 0, 0]
-    mag_list = [Magnet.Magnet(spin_vector, mag_position)]
+    if  np.linalg.norm(spin_vector) != 1:
+        spin_vector = spin_vector/np.linalg.norm(spin_vector)
+    mag_list = np.array([spin_vector])
     return mag_list, spin_vector
 
 #print(one_magnet()[0].vector)
@@ -34,7 +34,7 @@ def draw_spins_one_mag(spin_values):
     fig.show()
         
 
-spin_values = u.Heun([spin_list], 0, 10000, 100)#10**(-7), 10**(-8))
+spin_values = u.Heun(mag_list, 0, 10000, 100)#10**(-7), 10**(-8))
 
 f = open("vector_data.txt", "w")
 for vector in spin_values:

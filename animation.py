@@ -39,9 +39,12 @@ fig, ax = plt.subplots(subplot_kw=dict(projection="3d"))
 vector_list = []
 f = open("vector_data.txt", "r")
 for line in f.readlines():
-    temp_string = line.strip("[]\n")
+    temp_string = line.strip("[ ] \n")
+    temp_string = temp_string.replace("[", "")
+    temp_string = temp_string.replace("]", "")
     floats = [float(x) for x in temp_string.split()]
-    vector_list.append(floats)
+    for i in range(len(floats)//3):
+        vector_list.append(floats[i*3:i*3+3])
 f.close()
 vector_list = np.asarray(vector_list)
 #------------------------------------
@@ -77,7 +80,7 @@ def update(i):
     
 
  #Nå vil linspace lage masse float verdier
- #For å skippe masse verdier, kan num=len(vector_list) fjernes
-ani = FuncAnimation(fig, update, frames=np.linspace(0,len(vector_list) - 1), interval=50)
+ #For å skippe masse verdier, kan num=len(vector_list) fjernes fra frames
+ani = FuncAnimation(fig, update, frames=np.linspace(0, len(vector_list) - 1, num=len(vector_list)), interval=50)
 plt.show()
 #-----------------------------------

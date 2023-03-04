@@ -8,10 +8,17 @@ def one_magnet():
     if  np.linalg.norm(spin_vector) != 1:
         spin_vector = spin_vector/np.linalg.norm(spin_vector)
     mag_list = np.array([spin_vector])
-    return mag_list, spin_vector
+    return mag_list
 
-#print(one_magnet()[0].vector)
-mag_list, spin_list = one_magnet()
+def two_magnet():
+    spin_vector = np.array([0.3, 0.3, np.sqrt(1 - 0.3**2 - 0.3**2)])
+    spin_vector2 = np.array([0.2, -0.2, 0.8])
+    if  np.linalg.norm(spin_vector) != 1:
+        spin_vector = spin_vector/np.linalg.norm(spin_vector)
+    if  np.linalg.norm(spin_vector2) != 1:
+        spin_vector2 = spin_vector2/np.linalg.norm(spin_vector2)
+    mag_list = np.array([spin_vector, spin_vector2])
+    return mag_list
 
 
 def draw_spins_one_mag(spin_values):
@@ -34,13 +41,17 @@ def draw_spins_one_mag(spin_values):
     fig.show()
         
 
-timestep = np.linspace(0, 10**(-7), num=100)
 
+
+mag_list = two_magnet()
+timestep = np.linspace(0, 100000, num=1000)
 spin_values = u.Heun(mag_list, timestep)#10**(-7), 10**(-8))
 
 f = open("vector_data.txt", "w")
-for vector in spin_values:
-    f.write(str(vector) + "\n")
+for el in spin_values:
+    for vector in el:
+        f.write(str(vector) + " ")
+    f.write("\n")
 f.close()
 
 #draw_spins_one_mag(spin_values)

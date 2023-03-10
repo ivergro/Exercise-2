@@ -1,6 +1,7 @@
 import utilities as u
 import plotly.graph_objects as go
 import numpy as np
+import random as r
 
 
 def one_magnet():
@@ -20,31 +21,21 @@ def two_magnet():
     mag_list = np.array([spin_vector, spin_vector2])
     return mag_list
 
-
-def draw_spins_one_mag(spin_values):
-    X = []
-    Y = []
-    Z = []
-    U = []
-    V = []
-    W = []
-    for i in range(len(spin_values)):
-        X.append(0 + i)
-        Y.append(0)
-        Z.append(0)
-        U.append(spin_values[i][0])
-        V.append(spin_values[i][1])
-        W.append(spin_values[i][2]) 
-    
-    fig = go.Figure(data=go.Cone(x = X, y = Y, z = Z, u = U, v = V, w = W,
-                                 sizemode="absolute", anchor="tail", sizeref=2))
-    fig.show()
+def multi_magnet(N):
+    mag_list = []
+    #generere tilfeldige tall på en bedre måte? Flere på en gang for eksempel
+    for i in range(N):
+        x = r.random()*2 - 1
+        y = r.random()*2 - 1
+        z = r.random()*2 - 1
+        mag_list.append(np.array([x, y, z])/np.linalg.norm([x,y,z]))
+    return mag_list
         
 
 
 delta_t = 10*(-8)
 timesteps = 1000
-mag_list = one_magnet()
+mag_list = multi_magnet(10)
 timestep = np.linspace(0, timesteps*delta_t, num=timesteps)
 spin_values = u.Heun(mag_list, timestep)#10**(-7), 10**(-8))
 

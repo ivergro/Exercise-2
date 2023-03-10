@@ -5,7 +5,7 @@ import scipy.constants as sp
 #------Constants-------
 J     = 0.00    #[eV]
 d_z   = 0.001   #[eV] 
-kB_T  = 0.0001   #[eV]
+kB_T  = 0.000   #[eV]
 uB_0  = 0.003   #[eV]
 gamma = 1.6*10**11 #[Hz/T]
 u     = 5.8*10**(-5) #[eV/T]

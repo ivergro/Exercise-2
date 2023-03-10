@@ -42,9 +42,10 @@ def draw_spins_one_mag(spin_values):
         
 
 
-
-mag_list = two_magnet()
-timestep = np.linspace(0, 100000, num=1000)
+delta_t = 10*(-8)
+timesteps = 1000
+mag_list = one_magnet()
+timestep = np.linspace(0, timesteps*delta_t, num=timestep)
 spin_values = u.Heun(mag_list, timestep)#10**(-7), 10**(-8))
 
 f = open("vector_data.txt", "w")

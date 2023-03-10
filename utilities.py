@@ -5,12 +5,11 @@ import scipy.constants as sp
 #------Constants-------
 J     = 0.00    #[eV]
 d_z   = 0.001   #[eV] 
-kB_T  = 0.000   #[eV]
+kB_T  = 0.0001   #[eV]
 uB_0  = 0.003   #[eV]
 gamma = 1.6*10**11 #[Hz/T]
 u     = 5.8*10**(-5) #[eV/T]
 alpha = 0.1
-temp  = kB_T/sp.k
 #----------------------
 #-------Vectors--------
 B = np.array([0.0,0.0,0*uB_0/u]) #Dele på u?
@@ -105,7 +104,7 @@ def gamma_vector(t):
     return np.random.normal(0, 1, 3)
 
 def gaussian_thermal_noise(t, delta_t):
-    return gamma_vector(t) * np.sqrt((2*alpha*kB_T*temp) / (gamma*u*delta_t))
+    return gamma_vector(t) * np.sqrt((2*alpha*kB_T) / (gamma*u*delta_t))
 
 #Hamiltonian for a 1D model and nearest neighbour interactions
 #Used at all?

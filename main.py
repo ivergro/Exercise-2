@@ -33,9 +33,11 @@ def multi_magnet(N):
         
 
 
-delta_t = 10*(-8)
-timesteps = 1000
-mag_list = multi_magnet(10)
+delta_t   = 10*(-8)
+timesteps = 100
+N         = 10
+
+mag_list = multi_magnet(N)
 timestep = np.linspace(0, timesteps*delta_t, num=timesteps)
 spin_values = u.Heun(mag_list, timestep)#10**(-7), 10**(-8))
 
@@ -45,7 +47,3 @@ for el in spin_values:
         f.write(str(vector) + " ")
     f.write("\n")
 f.close()
-
-#draw_spins_one_mag(spin_values)
-
-#animation.vector_plot(spin_values)

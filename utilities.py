@@ -3,13 +3,13 @@ import random as r
 import scipy.constants as sp
 
 #------Constants-------
-J     = 0.00    #[eV]
-d_z   = 0.001   #[eV] 
+J     = 0.01    #[eV]
+d_z   = 0.3*J   #[eV] 
 kB_T  = 0.000   #[eV]
 uB_0  = 0.003   #[eV]
 gamma = 1.6*10**11 #[Hz/T]
 u     = 5.8*10**(-5) #[eV/T]
-alpha = 0.1
+alpha = 0.2
 #----------------------
 #-------Vectors--------
 B = np.array([0.0,0.0,0*uB_0/u]) #Dele på u?

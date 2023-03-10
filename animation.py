@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
 from matplotlib.animation import FuncAnimation
+
 
 
 fig, ax = plt.subplots(subplot_kw=dict(projection="3d"))
@@ -65,5 +67,9 @@ def update(i):
  #Nå vil linspace lage masse float verdier
  #For å skippe masse verdier, kan num=len(vector_list) fjernes fra frames
 ani = FuncAnimation(fig, update, frames=np.linspace(0, len(vector_data_list) - 1, num=len(vector_data_list)), interval=50)
-plt.show()
+#plt.show()
+
+f = r"animations/Prep-2.1.2.gif" 
+writergif = animation.PillowWriter(fps=30) 
+ani.save(f, writer=writergif)
 #-----------------------------------
